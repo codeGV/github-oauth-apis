@@ -90,8 +90,8 @@ exports.getAllReposWithPagination = async (req, res) => {
       .populate("orgId", "name url")
       .exec();
 
-    const totalRepositories = await Repository.countDocuments();
-    const totalPages = Math.ceil(totalRepositories / limit);
+    const totalCount = await Repository.countDocuments();
+    const totalPages = Math.ceil(totalCount / limit);
     const repoDetailsPromises = repositories.map(async (repo) => {
       if (repo.include) {
         const details = await getRepoDetails(repo, accessToken);
@@ -105,7 +105,7 @@ exports.getAllReposWithPagination = async (req, res) => {
       repositories: detailedRepositories,
       totalPages,
       currentPage: page,
-      totalRepositories,
+      totalCount,
     });
   } catch (error) {
     console.error("Error fetching repositories with pagination:", error);
