@@ -1,17 +1,13 @@
 const express = require("express");
 
 const {
-  getAllOrganizations,
-  getAllOrgRepos,
-  getAllOrganizationsRepo,
-  getRepoDetails,
+  getAllReposWithPagination,
+  toggleRepoInclude,
 } = require("../controllers/githubController");
+const authenticateUser = require("../helpers/authMiddleware");
 const router = express.Router();
 
-
-router.get("/organizations", getAllOrganizations);
-router.get("/organizations/:org/repos", getAllOrgRepos);
-router.get("/organizations/repos", getAllOrganizationsRepo);
-router.get("/repos/:owner/:repo/details", getRepoDetails);
+router.get("/organizations/repos", authenticateUser, getAllReposWithPagination);
+router.post("/repos/toggleInclude", authenticateUser, toggleRepoInclude);
 
 module.exports = router;

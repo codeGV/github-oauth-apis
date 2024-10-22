@@ -1,5 +1,7 @@
 const Integration = require("../models/Integration");
 const axios = require("axios");
+const { getAllOrganizationsRepo } = require("../controllers/githubController");
+
 
 const storeAuthDetails = async (profile, accessToken) => {
   const existingIntegration = await Integration.findOne({
@@ -85,6 +87,7 @@ exports.githubCallback = async (req, res) => {
 
       const userProfile = userResponse.data;
       await storeAuthDetails(userProfile, accessToken);
+      await getAllOrganizationsRepo(`Bearer ${accessToken}`, userProfile.id);
       res.redirect(`http://localhost:4200/integration?id=${userProfile.id}`);
     } else {
       res.status(400).send("Failed to exchange code for access token");
