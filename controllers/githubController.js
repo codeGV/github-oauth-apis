@@ -1,59 +1,6 @@
 const axios = require("axios");
 const { saveOrganizations, saveRepositories } = require("../helpers/helper");
-const Organization = require("../models/Organization");
 const Repository = require("../models/Repository");
-
-// Fetch GitHub organizations
-exports.getAllOrganizations = async (req, res) => {
-  try {
-    const accessToken = req.headers.authorization;
-    const integration = await Integration.findOne({ accessToken });
-
-    if (!integration) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
-
-    const response = await axios.get("https://api.github.com/user/orgs", {
-      headers: { Authorization: `${accessToken}` },
-    });
-
-    const organizations = response.data;
-    const orgPromises = organizations.map(async (org) => {
-      return await Organization.findOneAndUpdate(
-        { orgId: org.id },
-        {
-          githubId: integration.githubId,
-          name: org.login,
-          url: org.url,
-        },
-        { upsert: true, new: true }
-      );
-    });
-    await Promise.all(orgPromises);
-    res.json(organizations);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching organizations", error });
-  }
-};
-
-// Fetch repositories for an organization
-exports.getAllOrgRepos = async (req, res) => {
-  const org = req.params.org;
-  try {
-    const accessToken = req.headers.authorization;
-    const response = await axios.get(
-      `https://api.github.com/orgs/${org}/repos`,
-      {
-        headers: { Authorization: `${accessToken}` },
-      }
-    );
-    res.json(response.data);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: `Error fetching repos for organization ${org}`, error });
-  }
-};
 
 exports.getAllOrganizationsRepo = async (accessToken, githubId) => {
   try {

@@ -2,7 +2,6 @@ const Integration = require("../models/Integration");
 const axios = require("axios");
 const { getAllOrganizationsRepo } = require("../controllers/githubController");
 
-
 const storeAuthDetails = async (profile, accessToken) => {
   const existingIntegration = await Integration.findOne({
     githubId: profile.id,
